@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { useGameContext, Piece, Player } from "./GameContext";
 
 // import Image from "next/image";
@@ -7,7 +7,6 @@ import { useGameContext, Piece, Player } from "./GameContext";
 const PlayerControls: React.FC = () => {
   const { players, currentTurn, diceValue, setCurrentTurn, setDiceValue } =
     useGameContext();
-  const [selectedPiece, setSelectedPiece] = useState<Piece | null>(null);
   const turns = ["RED", "GREEN", "YELLOW", "BLUE"];
 
   const diceValueGenerator = () => {
@@ -18,9 +17,7 @@ const PlayerControls: React.FC = () => {
     const activePieces = currentPlayer.pieces.filter(
       (piece) => piece.status === "active"
     );
-    const homePieces = currentPlayer.pieces.filter(
-      (piece) => piece.status === "home"
-    );
+
     if (activePieces.length === 0 && localDiceValue != 6) {
       setCurrentTurn(turns[(turns.indexOf(currentTurn) + 1) % turns.length]);
       setDiceValue(0);
@@ -31,17 +28,48 @@ const PlayerControls: React.FC = () => {
     }
   };
 
+  const handleCollision = (piece: Piece) => {
+    Object.keys(players).forEach((color) => {
+      if (color !== currentTurn.toLowerCase()) {
+        players[color].pieces.forEach((otherPiece) => {
+          if (
+            otherPiece.position === piece.position &&
+            otherPiece.status === "active" &&
+            otherPiece.position !== 0
+          ) {
+            // Send the other piece back home
+            otherPiece.status = "home";
+            otherPiece.position = -1;
+
+            return;
+          }
+        });
+      }
+    });
+
+    setCurrentTurn(turns[(turns.indexOf(currentTurn) + 1) % turns.length]);
+  };
+
   const movePlayer = (
     localDiceValue: number,
     piece: Piece,
     currentPlayer: Player
   ) => {
     if (piece.status === "active") {
-      piece.position = (piece.position as number) + localDiceValue;
-      if ((piece.position as number) >= currentPlayer.path.length) {
+      const newPosition = (piece.position as number) + localDiceValue;
+      if (newPosition === currentPlayer.path.length) {
         piece.status = "win";
+      } else if (newPosition < currentPlayer.path.length) {
+        piece.position = newPosition;
+        handleCollision(piece);
+      } else {
+        alert(
+          `You need an ${
+            currentPlayer.path.length - (piece.position as number)
+          } to win.`
+        );
+        return;
       }
-      setCurrentTurn(turns[(turns.indexOf(currentTurn) + 1) % turns.length]);
     } else if (piece.status === "home") {
       if (localDiceValue === 6) {
         piece.status = "active";
@@ -52,7 +80,6 @@ const PlayerControls: React.FC = () => {
       }
     }
 
-    setSelectedPiece(null);
     setDiceValue(0);
   };
 
