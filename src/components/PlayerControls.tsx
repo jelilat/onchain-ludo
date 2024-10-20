@@ -18,14 +18,16 @@ const PlayerControls: React.FC = () => {
       (piece) => piece.status === "active"
     );
 
-    if (activePieces.length === 0 && localDiceValue != 6) {
-      setCurrentTurn(turns[(turns.indexOf(currentTurn) + 1) % turns.length]);
-      setDiceValue(0);
-      return;
-    }
-    if (activePieces.length === 1 && localDiceValue != 6) {
-      movePlayer(localDiceValue, activePieces[0], currentPlayer);
-    }
+    setTimeout(() => {
+      if (activePieces.length === 0 && localDiceValue != 6) {
+        setCurrentTurn(turns[(turns.indexOf(currentTurn) + 1) % turns.length]);
+        setDiceValue(0);
+        return;
+      }
+      if (activePieces.length === 1 && localDiceValue != 6) {
+        movePlayer(localDiceValue, activePieces[0], currentPlayer);
+      }
+    }, 700);
   };
 
   const handleCollision = (piece: Piece) => {
@@ -103,7 +105,7 @@ const PlayerControls: React.FC = () => {
       </div>
       <button
         id="dice"
-        className="d0"
+        className={`d${diceValue} ${diceValue > 0 ? "opacity-50" : ""}`}
         disabled={diceValue > 0}
         onClick={diceValueGenerator}
       ></button>
