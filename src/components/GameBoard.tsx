@@ -5,9 +5,40 @@ import { useGameContext } from "./GameContext";
 const GameBoard: React.FC = () => {
   const { players, diceValue, currentTurn } = useGameContext();
 
+  const greenPositions = [4, 5, 7, 10, 13, 16];
+  const redPositions = [19, 31, 32, 33, 34, 35];
+  const yellowPositions = [36, 37, 38, 39, 40, 52];
+  const bluePositions = [55, 58, 61, 64, 66, 67];
+
+  const getColorClass = (index: number) => {
+    if (greenPositions.includes(index)) return "bg-green";
+    if (redPositions.includes(index)) return "bg-red";
+    if (yellowPositions.includes(index)) return "bg-yellow";
+    if (bluePositions.includes(index)) return "bg-blue";
+    return "";
+  };
+
   useEffect(() => {
     if (diceValue === 0) return;
-  }, [diceValue, currentTurn]);
+  }, [diceValue]);
+
+  const renderPieces = (color: string, step: number) => {
+    const path = players[color].path;
+    return players[color].pieces.map((piece, index) => {
+      if (typeof piece.position === "number" && piece.position !== -1) {
+        const pieceStep = path[piece.position];
+        if (pieceStep === step) {
+          return (
+            <button
+              key={`${color}-${index}`}
+              id={`movered${index + 1}`}
+              className={`player movered${index + 1} bg-${color}`}
+            ></button>
+          );
+        }
+      }
+    });
+  };
 
   return (
     <div className="ludo-board">
@@ -27,9 +58,6 @@ const GameBoard: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
 
       <div className="green-home green-home-bg bg-green super-center">
         <div className="white-box super-center">
@@ -47,27 +75,7 @@ const GameBoard: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="step"></div>
-      <div className="step bg-green"></div>
-      <div className="step bg-green"></div>
-      <div className="step"></div>
-      <div className="step bg-green"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step bg-green"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step bg-green"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step bg-green"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step bg-red"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
+
       <div className="winner-home">
         <div className="rwh stack">
           {players.red.pieces.map((piece, index) => (
@@ -106,36 +114,7 @@ const GameBoard: React.FC = () => {
           ))}
         </div>
       </div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step bg-red"></div>
-      <div className="step bg-red"></div>
-      <div className="step bg-red"></div>
-      <div className="step bg-red"></div>
-      <div className="step bg-red"></div>
-      <div className="step bg-yellow"></div>
-      <div className="step bg-yellow"></div>
-      <div className="step bg-yellow"></div>
-      <div className="step bg-yellow"></div>
-      <div className="step bg-yellow"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step bg-yellow"></div>
-      <div className="step"></div>
+
       <div className="blue-home bg-blue blue-home-bg super-center">
         <div className="white-box super-center">
           <div className="player-room">
@@ -174,24 +153,14 @@ const GameBoard: React.FC = () => {
         <div className="bwh stack"></div>
         <div className="ywh stack"></div>
       </div>
-      <div className="step"></div>
-      <div className="step bg-blue"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step bg-blue"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step bg-blue"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step bg-blue"></div>
-      <div className="step"></div>
-      <div className="step bg-blue"></div>
-      <div className="step bg-blue"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
-      <div className="step"></div>
+      {Array.from({ length: 72 }).map((_, index) => (
+        <div key={index} className={`step ${getColorClass(index)}`}>
+          {renderPieces("red", index)}
+          {renderPieces("green", index)}
+          {renderPieces("blue", index)}
+          {renderPieces("yellow", index)}
+        </div>
+      ))}
     </div>
   );
 };

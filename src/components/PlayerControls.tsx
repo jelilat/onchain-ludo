@@ -11,9 +11,9 @@ const PlayerControls: React.FC = () => {
   const turns = ["RED", "GREEN", "YELLOW", "BLUE"];
 
   const diceValueGenerator = () => {
-    const diceValue = Math.floor(Math.random() * 6) + 1;
-    setDiceValue(diceValue);
-    console.log(diceValue);
+    const localDiceValue = Math.floor(Math.random() * 6) + 1;
+    setDiceValue(localDiceValue);
+    console.log(localDiceValue);
     const currentPlayer = players[currentTurn.toLowerCase()];
     const activePieces = currentPlayer.pieces.filter(
       (piece) => piece.status === "active"
@@ -21,31 +21,31 @@ const PlayerControls: React.FC = () => {
     const homePieces = currentPlayer.pieces.filter(
       (piece) => piece.status === "home"
     );
-    if (activePieces.length === 0 && diceValue != 6) {
+    if (activePieces.length === 0 && localDiceValue != 6) {
       setCurrentTurn(turns[(turns.indexOf(currentTurn) + 1) % turns.length]);
       setDiceValue(0);
       return;
     }
-    if (activePieces.length === 1 && diceValue != 6) {
-      movePlayer(diceValue, activePieces[0], currentPlayer);
+    if (activePieces.length === 1 && localDiceValue != 6) {
+      movePlayer(localDiceValue, activePieces[0], currentPlayer);
     }
   };
 
   const movePlayer = (
-    diceValue: number,
+    localDiceValue: number,
     piece: Piece,
     currentPlayer: Player
   ) => {
     if (piece.status === "active") {
-      piece.position = (piece.position as number) + diceValue;
+      piece.position = (piece.position as number) + localDiceValue;
       if ((piece.position as number) >= currentPlayer.path.length) {
         piece.status = "win";
       }
       setCurrentTurn(turns[(turns.indexOf(currentTurn) + 1) % turns.length]);
     } else if (piece.status === "home") {
-      if (diceValue === 6) {
+      if (localDiceValue === 6) {
         piece.status = "active";
-        piece.position = (piece.position as number) + diceValue;
+        piece.position = 0;
       } else {
         alert("You need a 6 to move from home");
         return;

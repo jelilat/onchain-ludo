@@ -32,10 +32,10 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
     red: {
       color: "red",
       pieces: [
-        { position: 0, status: "home" },
-        { position: 0, status: "home" },
-        { position: 0, status: "home" },
-        { position: 0, status: "home" },
+        { position: -1, status: "home" },
+        { position: -1, status: "home" },
+        { position: -1, status: "home" },
+        { position: -1, status: "home" },
       ],
       path: [
         19,
@@ -100,10 +100,10 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
     green: {
       color: "green",
       pieces: [
-        { position: 0, status: "home" },
-        { position: 0, status: "home" },
-        { position: 0, status: "home" },
-        { position: 0, status: "home" },
+        { position: -1, status: "home" },
+        { position: -1, status: "home" },
+        { position: -1, status: "home" },
+        { position: -1, status: "home" },
       ],
       path: [
         5,
@@ -168,10 +168,10 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
     blue: {
       color: "blue",
       pieces: [
-        { position: 0, status: "home" },
-        { position: 0, status: "home" },
-        { position: 0, status: "home" },
-        { position: 0, status: "home" },
+        { position: -1, status: "home" },
+        { position: -1, status: "home" },
+        { position: -1, status: "home" },
+        { position: -1, status: "home" },
       ],
       path: [
         66,
@@ -236,10 +236,10 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
     yellow: {
       color: "yellow",
       pieces: [
-        { position: 0, status: "home" },
-        { position: 0, status: "home" },
-        { position: 0, status: "home" },
-        { position: 0, status: "home" },
+        { position: -1, status: "home" },
+        { position: -1, status: "home" },
+        { position: -1, status: "home" },
+        { position: -1, status: "home" },
       ],
       path: [
         52,
