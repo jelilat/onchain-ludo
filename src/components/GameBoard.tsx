@@ -1,9 +1,9 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import { useGameContext } from "./GameContext";
 
 const GameBoard: React.FC = () => {
-  const { players, diceValue, currentTurn } = useGameContext();
+  const { players } = useGameContext();
 
   const greenPositions = [4, 5, 7, 10, 13, 16];
   const redPositions = [19, 31, 32, 33, 34, 35];
@@ -17,10 +17,6 @@ const GameBoard: React.FC = () => {
     if (bluePositions.includes(index)) return "bg-blue";
     return "";
   };
-
-  useEffect(() => {
-    if (diceValue === 0) return;
-  }, [diceValue]);
 
   const renderPieces = (color: string, step: number) => {
     const path = players[color].path;
@@ -147,12 +143,7 @@ const GameBoard: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="winner-home">
-        <div className="rwh stack"></div>
-        <div className="gwh stack"></div>
-        <div className="bwh stack"></div>
-        <div className="ywh stack"></div>
-      </div>
+
       {Array.from({ length: 72 }).map((_, index) => (
         <div key={index} className={`step ${getColorClass(index)}`}>
           {renderPieces("red", index)}
