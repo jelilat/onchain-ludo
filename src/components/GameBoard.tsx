@@ -1,15 +1,29 @@
-import React from "react";
+"use client";
+import React, { useEffect } from "react";
+import { useGameContext } from "./GameContext";
 
 const GameBoard: React.FC = () => {
+  const { players, diceValue, currentTurn } = useGameContext();
+
+  useEffect(() => {
+    if (diceValue === 0) return;
+  }, [diceValue, currentTurn]);
+
   return (
     <div className="ludo-board">
       <div className="red-home red-home-bg bg-red super-center">
         <div className="white-box super-center">
           <div className="player-room">
-            <button id="movered1" className="player movered1 bg-red"></button>
-            <button id="movered2" className="player movered2 bg-red"></button>
-            <button id="movered3" className="player movered3 bg-red"></button>
-            <button id="movered4" className="player movered4 bg-red"></button>
+            {players.red.pieces.map((piece, index) => (
+              <div key={index}>
+                {piece.status === "home" && (
+                  <button
+                    id={`movered${index + 1}`}
+                    className={`player movered${index + 1} bg-red`}
+                  ></button>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -20,22 +34,16 @@ const GameBoard: React.FC = () => {
       <div className="green-home green-home-bg bg-green super-center">
         <div className="white-box super-center">
           <div className="player-room">
-            <button
-              id="movegreen1"
-              className="player movegreen1 bg-green"
-            ></button>
-            <button
-              id="movegreen2"
-              className="player movegreen2 bg-green"
-            ></button>
-            <button
-              id="movegreen3"
-              className="player movegreen3 bg-green"
-            ></button>
-            <button
-              id="movegreen4"
-              className="player movegreen4 bg-green"
-            ></button>
+            {players.green.pieces.map((piece, index) => (
+              <div key={index}>
+                {piece.status === "home" && (
+                  <button
+                    id={`movegreen${index + 1}`}
+                    className={`player movegreen${index + 1} bg-green`}
+                  ></button>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -61,10 +69,42 @@ const GameBoard: React.FC = () => {
       <div className="step"></div>
       <div className="step"></div>
       <div className="winner-home">
-        <div className="rwh stack"></div>
-        <div className="gwh stack"></div>
-        <div className="bwh stack"></div>
-        <div className="ywh stack"></div>
+        <div className="rwh stack">
+          {players.red.pieces.map((piece, index) => (
+            <button
+              key={index}
+              style={{ display: piece.status !== "win" ? "none" : "block" }}
+              className={`player movered${index + 1} bg-red`}
+            ></button>
+          ))}
+        </div>
+        <div className="gwh stack">
+          {players.green.pieces.map((piece, index) => (
+            <button
+              key={index}
+              style={{ display: piece.status !== "win" ? "none" : "block" }}
+              className={`player movegreen${index + 1} bg-green`}
+            ></button>
+          ))}
+        </div>
+        <div className="bwh stack">
+          {players.blue.pieces.map((piece, index) => (
+            <button
+              key={index}
+              style={{ display: piece.status !== "win" ? "none" : "block" }}
+              className={`player moveblue${index + 1} bg-blue`}
+            ></button>
+          ))}
+        </div>
+        <div className="ywh stack">
+          {players.yellow.pieces.map((piece, index) => (
+            <button
+              key={index}
+              style={{ display: piece.status !== "win" ? "none" : "block" }}
+              className={`player moveyellow${index + 1} bg-yellow`}
+            ></button>
+          ))}
+        </div>
       </div>
       <div className="step"></div>
       <div className="step"></div>
@@ -99,44 +139,32 @@ const GameBoard: React.FC = () => {
       <div className="blue-home bg-blue blue-home-bg super-center">
         <div className="white-box super-center">
           <div className="player-room">
-            <button
-              id="moveblue1"
-              className="player moveblue1 bg-blue"
-            ></button>
-            <button
-              id="moveblue2"
-              className="player moveblue2 bg-blue"
-            ></button>
-            <button
-              id="moveblue3"
-              className="player moveblue3 bg-blue"
-            ></button>
-            <button
-              id="moveblue4"
-              className="player moveblue4 bg-blue"
-            ></button>
+            {players.blue.pieces.map((piece, index) => (
+              <div key={index}>
+                {piece.status === "home" && (
+                  <button
+                    id={`moveblue${index + 1}`}
+                    className={`player moveblue${index + 1} bg-blue`}
+                  ></button>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>
       <div className="yellow-home yellow-home-bg bg-yellow super-center">
         <div className="white-box super-center">
           <div className="player-room">
-            <button
-              id="moveyellow1"
-              className="player moveyellow1 bg-yellow"
-            ></button>
-            <button
-              id="moveyellow2"
-              className="player moveyellow2 bg-yellow"
-            ></button>
-            <button
-              id="moveyellow3"
-              className="player moveyellow3 bg-yellow"
-            ></button>
-            <button
-              id="moveyellow4"
-              className="player moveyellow4 bg-yellow"
-            ></button>
+            {players.yellow.pieces.map((piece, index) => (
+              <div key={index}>
+                {piece.status === "home" && (
+                  <button
+                    id={`moveyellow${index + 1}`}
+                    className={`player moveyellow${index + 1} bg-yellow`}
+                  ></button>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>
