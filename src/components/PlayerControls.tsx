@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useRef, useState } from "react";
 import { useGameContext, Piece, Player } from "./GameContext";
 
 // import Image from "next/image";
@@ -7,7 +7,21 @@ import { useGameContext, Piece, Player } from "./GameContext";
 const PlayerControls: React.FC = () => {
   const { players, currentTurn, diceValue, setCurrentTurn, setDiceValue } =
     useGameContext();
+  const [winners, setWinners] = useState<string[]>([]);
   const turns = ["RED", "GREEN", "YELLOW", "BLUE"];
+  const sixes = useRef(0);
+
+  const getNextTurn = (
+    currentTurn: string,
+    winners: string[],
+    turns: string[]
+  ) => {
+    let nextIndex = (turns.indexOf(currentTurn) + 1) % turns.length;
+    while (winners.includes(turns[nextIndex])) {
+      nextIndex = (nextIndex + 1) % turns.length;
+    }
+    return turns[nextIndex];
+  };
 
   const diceValueGenerator = () => {
     const localDiceValue = Math.floor(Math.random() * 6) + 1;
@@ -18,8 +32,16 @@ const PlayerControls: React.FC = () => {
     );
 
     setTimeout(() => {
-      if (activePieces.length === 0 && localDiceValue != 6) {
-        setCurrentTurn(turns[(turns.indexOf(currentTurn) + 1) % turns.length]);
+      if (localDiceValue === 6) {
+        sixes.current += 1;
+      }
+
+      if (
+        (activePieces.length === 0 && localDiceValue != 6) ||
+        sixes.current === 3
+      ) {
+        sixes.current = 0;
+        setCurrentTurn(getNextTurn(currentTurn, winners, turns));
         setDiceValue(0);
         return;
       }
@@ -54,7 +76,8 @@ const PlayerControls: React.FC = () => {
     });
 
     if (value != 6) {
-      setCurrentTurn(turns[(turns.indexOf(currentTurn) + 1) % turns.length]);
+      sixes.current = 0;
+      setCurrentTurn(getNextTurn(currentTurn, winners, turns));
     }
   };
 
@@ -67,6 +90,13 @@ const PlayerControls: React.FC = () => {
       const newPosition = (piece.position as number) + localDiceValue;
       if (newPosition === currentPlayer.path.length) {
         piece.status = "win";
+        // check if all the piece status are wins
+        const allWin = players[currentTurn.toLowerCase()].pieces.every(
+          (piece) => piece.status === "win"
+        );
+        if (allWin) {
+          setWinners((prevWinners) => [...prevWinners, currentTurn]);
+        }
       } else if (newPosition < currentPlayer.path.length) {
         piece.position = newPosition;
         handleCollision(currentPlayer.path, localDiceValue, newPosition);
