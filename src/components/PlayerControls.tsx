@@ -12,7 +12,6 @@ const PlayerControls: React.FC = () => {
   const diceValueGenerator = () => {
     const localDiceValue = Math.floor(Math.random() * 6) + 1;
     setDiceValue(localDiceValue);
-    console.log(localDiceValue);
     const currentPlayer = players[currentTurn.toLowerCase()];
     const activePieces = currentPlayer.pieces.filter(
       (piece) => piece.status === "active"
@@ -27,15 +26,20 @@ const PlayerControls: React.FC = () => {
       if (activePieces.length === 1 && localDiceValue != 6) {
         movePlayer(localDiceValue, activePieces[0], currentPlayer);
       }
-    }, 700);
+    }, 500);
   };
 
-  const handleCollision = (piece: Piece) => {
+  const handleCollision = (
+    path: (number | string)[],
+    value: number,
+    position: number
+  ) => {
     Object.keys(players).forEach((color) => {
       if (color !== currentTurn.toLowerCase()) {
         players[color].pieces.forEach((otherPiece) => {
+          const otherPiecePath = players[color].path;
           if (
-            otherPiece.position === piece.position &&
+            path[position] === otherPiecePath[otherPiece.position as number] &&
             otherPiece.status === "active" &&
             otherPiece.position !== 0
           ) {
@@ -49,7 +53,9 @@ const PlayerControls: React.FC = () => {
       }
     });
 
-    setCurrentTurn(turns[(turns.indexOf(currentTurn) + 1) % turns.length]);
+    if (value != 6) {
+      setCurrentTurn(turns[(turns.indexOf(currentTurn) + 1) % turns.length]);
+    }
   };
 
   const movePlayer = (
@@ -63,7 +69,7 @@ const PlayerControls: React.FC = () => {
         piece.status = "win";
       } else if (newPosition < currentPlayer.path.length) {
         piece.position = newPosition;
-        handleCollision(piece);
+        handleCollision(currentPlayer.path, localDiceValue, newPosition);
       } else {
         alert(
           `You need an ${
@@ -76,6 +82,7 @@ const PlayerControls: React.FC = () => {
       if (localDiceValue === 6) {
         piece.status = "active";
         piece.position = 0;
+        handleCollision(currentPlayer.path, localDiceValue, 0);
       } else {
         alert("You need a 6 to move from home");
         return;
