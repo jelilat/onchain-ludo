@@ -147,84 +147,95 @@ const PlayerControls: React.FC = () => {
         onClick={diceValueGenerator}
       ></button>
       {currentTurn === "RED" && (
-        <div className="red_control control">
-          {players.red.pieces.map((piece, index) => {
-            return (
-              <button
-                key={index}
-                id={`movered${index + 1}`}
-                className={`player movered${index + 1} ${
-                  piece.status === "win" ? "bg-gray-400 opacity-50" : "bg-red"
-                }`}
-                onClick={() => {
-                  movePlayer(diceValue, piece, players.red);
-                }}
-              ></button>
-            );
-          })}
+        <div>
+          <div className="red_control control">
+            {players.red.pieces.map((piece, index) => {
+              return (
+                <button
+                  key={index}
+                  id={`movered${index + 1}`}
+                  className={`player movered${index + 1} ${
+                    piece.status === "win" ? "bg-gray-400 opacity-50" : "bg-red"
+                  }`}
+                  onClick={() => {
+                    movePlayer(diceValue, piece, players.red);
+                  }}
+                ></button>
+              );
+            })}
+          </div>
+          <h1 className="text-center text-3xl my-3">{players.red.name}</h1>
         </div>
       )}
       {currentTurn === "GREEN" && (
-        <div className="green_control control">
-          {players.green.pieces.map((piece, index) => {
-            return (
-              <button
-                key={index}
-                id={`movegreen${index + 1}`}
-                className={`player movegreen${index + 1} ${
-                  piece.status === "win" ? "bg-gray-400 opacity-50" : "bg-green"
-                }`}
-                onClick={() => {
-                  movePlayer(diceValue, piece, players.green);
-                }}
-              ></button>
-            );
-          })}
+        <div>
+          <div className="green_control control">
+            {players.green.pieces.map((piece, index) => {
+              return (
+                <button
+                  key={index}
+                  id={`movegreen${index + 1}`}
+                  className={`player movegreen${index + 1} ${
+                    piece.status === "win"
+                      ? "bg-gray-400 opacity-50"
+                      : "bg-green"
+                  }`}
+                  onClick={() => {
+                    movePlayer(diceValue, piece, players.green);
+                  }}
+                ></button>
+              );
+            })}
+          </div>
+          <h1 className="text-center text-3xl my-3">{players.green.name}</h1>
         </div>
       )}
       {currentTurn === "YELLOW" && (
-        <div className="yellow_control control">
-          {players.yellow.pieces.map((piece, index) => {
-            return (
-              <button
-                key={index}
-                id={`moveyellow${index + 1}`}
-                className={`player moveyellow${index + 1} ${
-                  piece.status === "win"
-                    ? "bg-gray-400 opacity-50"
-                    : "bg-yellow"
-                }`}
-                onClick={() => {
-                  movePlayer(diceValue, piece, players.yellow);
-                }}
-              ></button>
-            );
-          })}
+        <div>
+          <div className="yellow_control control">
+            {players.yellow.pieces.map((piece, index) => {
+              return (
+                <button
+                  key={index}
+                  id={`moveyellow${index + 1}`}
+                  className={`player moveyellow${index + 1} ${
+                    piece.status === "win"
+                      ? "bg-gray-400 opacity-50"
+                      : "bg-yellow"
+                  }`}
+                  onClick={() => {
+                    movePlayer(diceValue, piece, players.yellow);
+                  }}
+                ></button>
+              );
+            })}
+          </div>
+          <h1 className="text-center text-3xl my-3">{players.yellow.name}</h1>
         </div>
       )}
       {currentTurn === "BLUE" && (
-        <div className="blue_control control">
-          {players.blue.pieces.map((piece, index) => {
-            return (
-              <button
-                key={index}
-                id={`moveblue${index + 1}`}
-                className={`player moveblue${index + 1} ${
-                  piece.status === "win" ? "bg-gray-400 opacity-50" : "bg-blue"
-                }`}
-                onClick={() => {
-                  movePlayer(diceValue, piece, players.blue);
-                }}
-              ></button>
-            );
-          })}
+        <div>
+          <div className="blue_control control">
+            {players.blue.pieces.map((piece, index) => {
+              return (
+                <button
+                  key={index}
+                  id={`moveblue${index + 1}`}
+                  className={`player moveblue${index + 1} ${
+                    piece.status === "win"
+                      ? "bg-gray-400 opacity-50"
+                      : "bg-blue"
+                  }`}
+                  onClick={() => {
+                    movePlayer(diceValue, piece, players.blue);
+                  }}
+                ></button>
+              );
+            })}
+          </div>
+          <h1 className="text-center text-3xl my-3">{players.blue.name}</h1>
         </div>
       )}
-
-      <h1 className="red_control rc_name"></h1>
-      <h1 className="green_control gc_name"></h1>
-      <h1 className="yellow_control yc_name"></h1>
-      <h1 className="blue_control bc_name"></h1>
     </div>
   );
 };

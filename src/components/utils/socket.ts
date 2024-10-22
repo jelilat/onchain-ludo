@@ -3,7 +3,7 @@ import io, { Socket } from "socket.io-client";
 const URL =
   process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || "http://localhost:3001";
 
-type SocketType = typeof Socket | null;
+export type SocketType = typeof Socket | null;
 let socket: SocketType = null;
 
 export const initiateSocketConnection = (): SocketType => {

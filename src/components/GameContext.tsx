@@ -7,6 +7,7 @@ export interface Piece {
 }
 
 export interface Player {
+  name: string;
   color: string;
   pieces: Piece[];
   path: (number | string)[];
@@ -30,6 +31,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
   const [currentTurn, setCurrentTurn] = useState<string>("RED");
   const [players, setPlayers] = useState<Record<string, Player>>({
     red: {
+      name: "",
       color: "red",
       pieces: [
         { position: -1, status: "home" },
@@ -98,6 +100,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
       ],
     },
     green: {
+      name: "",
       color: "green",
       pieces: [
         { position: -1, status: "home" },
@@ -166,6 +169,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
       ],
     },
     blue: {
+      name: "",
       color: "blue",
       pieces: [
         { position: -1, status: "home" },
@@ -234,6 +238,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
       ],
     },
     yellow: {
+      name: "",
       color: "yellow",
       pieces: [
         { position: -1, status: "home" },
