@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { SocketType } from "./utils/socket";
 import io from "socket.io-client";
 import { useGameContext, Player } from "./GameContext";
 
@@ -13,23 +12,11 @@ interface RoomData {
   players: Player[];
 }
 
-interface PlayerJoinedData {
-  newPlayer: Player;
-  players: Player[];
-}
-
-interface PlayerLeftData {
-  removedPlayer: Player;
-  players: Player[];
-}
-
 const WelcomeScreen: React.FC = () => {
-  const [socket, setSocket] = useState<SocketType>(null);
   const [gameBoard, setGameBoard] = useState<boolean>(false);
-  const [roomCode, setRoomCode] = useState<string>("");
-  const [color, setColor] = useState<string>("");
   const [playerName, setPlayerName] = useState<string>("");
-  const { players } = useGameContext();
+  const { players, color, setColor, roomCode, setRoomCode, socket, setSocket } =
+    useGameContext();
 
   const colors = ["red", "green", "yellow", "blue"];
 
@@ -45,19 +32,18 @@ const WelcomeScreen: React.FC = () => {
       console.log("Room created:", data);
     });
 
-    newSocket.on("roomJoined", (data: RoomData) => {
-      console.log("Room joined:", data);
+    newSocket.on("playerJoined", ({ newPlayer }: { newPlayer: Player }) => {
+      console.log("New player joined:", newPlayer);
+      players[newPlayer.color].name = newPlayer.name;
     });
 
-    newSocket.on("playerJoined", (data: PlayerJoinedData) => {
-      console.log("New player joined:", data.newPlayer);
-      players[data.newPlayer.color].name = data.newPlayer.name;
-    });
-
-    newSocket.on("playerLeft", (data: PlayerLeftData) => {
-      console.log("Player left:", data.removedPlayer);
-      players[data.removedPlayer.color].name = "";
-    });
+    newSocket.on(
+      "playerLeft",
+      ({ removedPlayer }: { removedPlayer: Player }) => {
+        console.log("Player left:", removedPlayer);
+        players[removedPlayer.color].name = "";
+      }
+    );
 
     newSocket.on("roomError", (error: string) => {
       console.error("Room error:", error);

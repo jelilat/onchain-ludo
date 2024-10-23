@@ -1,15 +1,49 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useGameContext, Piece, Player } from "./GameContext";
 
-// import Image from "next/image";
-
 const PlayerControls: React.FC = () => {
-  const { players, currentTurn, diceValue, setCurrentTurn, setDiceValue } =
-    useGameContext();
+  const {
+    roomCode,
+    players,
+    currentTurn,
+    diceValue,
+    color,
+    socket,
+    setCurrentTurn,
+    setDiceValue,
+    setPlayers,
+  } = useGameContext();
   const [winners, setWinners] = useState<string[]>([]);
   const turns = ["RED", "GREEN", "YELLOW", "BLUE"];
   const sixes = useRef(0);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("diceRolled", (data: { value: number; turn: string }) => {
+        console.log("diceRolled", data);
+        setDiceValue(data.value);
+        setCurrentTurn(data.turn);
+      });
+
+      socket.on(
+        "gameStateUpdated",
+        (data: {
+          players: Record<string, Player>;
+          turn: string;
+          winners: string[];
+        }) => {
+          setDiceValue(0);
+          setPlayers(data.players);
+          setCurrentTurn(data.turn);
+          setWinners(data.winners);
+        }
+      );
+      return () => {
+        socket.disconnect();
+      };
+    }
+  }, [socket]);
 
   const getNextTurn = (
     currentTurn: string,
@@ -31,6 +65,12 @@ const PlayerControls: React.FC = () => {
       (piece) => piece.status === "active"
     );
 
+    socket!.emit("rollDice", {
+      roomCode,
+      value: localDiceValue,
+      turn: currentTurn,
+    });
+
     setTimeout(() => {
       if (localDiceValue === 6) {
         sixes.current += 1;
@@ -41,11 +81,15 @@ const PlayerControls: React.FC = () => {
         sixes.current === 3
       ) {
         sixes.current = 0;
-        setCurrentTurn(getNextTurn(currentTurn, winners, turns));
-        setDiceValue(0);
-        return;
-      }
-      if (activePieces.length === 1 && localDiceValue != 6) {
+        const nextTurn = getNextTurn(currentTurn, winners, turns);
+        setCurrentTurn(nextTurn);
+        socket!.emit("updateGameState", {
+          roomCode,
+          players,
+          turn: nextTurn,
+          winners,
+        });
+      } else if (activePieces.length === 1 && localDiceValue != 6) {
         movePlayer(localDiceValue, activePieces[0], currentPlayer);
       }
     }, 500);
@@ -56,10 +100,11 @@ const PlayerControls: React.FC = () => {
     value: number,
     position: number
   ) => {
-    Object.keys(players).forEach((color) => {
+    const updatedPlayers = { ...players };
+    Object.keys(updatedPlayers).forEach((color) => {
       if (color !== currentTurn.toLowerCase()) {
-        players[color].pieces.forEach((otherPiece) => {
-          const otherPiecePath = players[color].path;
+        updatedPlayers[color].pieces.forEach((otherPiece) => {
+          const otherPiecePath = updatedPlayers[color].path;
           if (
             path[position] === otherPiecePath[otherPiece.position as number] &&
             otherPiece.status === "active" &&
@@ -77,8 +122,15 @@ const PlayerControls: React.FC = () => {
 
     if (value != 6) {
       sixes.current = 0;
-      setCurrentTurn(getNextTurn(currentTurn, winners, turns));
     }
+    const nextTurn = getNextTurn(currentTurn, winners, turns);
+
+    socket!.emit("updateGameState", {
+      roomCode,
+      players: updatedPlayers,
+      turn: value === 6 ? currentTurn : nextTurn,
+      winners,
+    });
   };
 
   const movePlayer = (
@@ -86,23 +138,33 @@ const PlayerControls: React.FC = () => {
     piece: Piece,
     currentPlayer: Player
   ) => {
+    const updatedPlayers = { ...players };
+    const updatedWinners = [...winners];
+
     if (piece.status === "active") {
       const newPosition = (piece.position as number) + localDiceValue;
       if (newPosition === currentPlayer.path.length) {
         piece.status = "win";
         // check if all the piece status are wins
-        const allWin = players[currentTurn.toLowerCase()].pieces.every(
+        const allWin = updatedPlayers[currentTurn.toLowerCase()].pieces.every(
           (piece) => piece.status === "win"
         );
         if (allWin) {
-          setWinners((prevWinners) => [...prevWinners, currentTurn]);
+          updatedWinners.push(currentTurn);
         }
+
+        socket!.emit("updateGameState", {
+          roomCode,
+          players: updatedPlayers,
+          turn: currentTurn,
+          winners: updatedWinners,
+        });
       } else if (newPosition < currentPlayer.path.length) {
         piece.position = newPosition;
         handleCollision(currentPlayer.path, localDiceValue, newPosition);
       } else {
         alert(
-          `You need an ${
+          `You need a ${
             currentPlayer.path.length - (piece.position as number)
           } to win.`
         );
@@ -118,8 +180,6 @@ const PlayerControls: React.FC = () => {
         return;
       }
     }
-
-    setDiceValue(0);
   };
 
   return (
@@ -142,8 +202,12 @@ const PlayerControls: React.FC = () => {
       </div>
       <button
         id="dice"
-        className={`d${diceValue} ${diceValue > 0 ? "opacity-50" : ""}`}
-        disabled={diceValue > 0}
+        className={`d${diceValue} ${
+          diceValue > 0 || color !== currentTurn.toLowerCase()
+            ? "opacity-50"
+            : ""
+        }`}
+        disabled={diceValue > 0 || color !== currentTurn.toLowerCase()}
         onClick={diceValueGenerator}
       ></button>
       {currentTurn === "RED" && (
@@ -157,6 +221,7 @@ const PlayerControls: React.FC = () => {
                   className={`player movered${index + 1} ${
                     piece.status === "win" ? "bg-gray-400 opacity-50" : "bg-red"
                   }`}
+                  disabled={color !== currentTurn.toLowerCase()}
                   onClick={() => {
                     movePlayer(diceValue, piece, players.red);
                   }}
@@ -180,6 +245,7 @@ const PlayerControls: React.FC = () => {
                       ? "bg-gray-400 opacity-50"
                       : "bg-green"
                   }`}
+                  disabled={color !== currentTurn.toLowerCase()}
                   onClick={() => {
                     movePlayer(diceValue, piece, players.green);
                   }}
@@ -203,6 +269,7 @@ const PlayerControls: React.FC = () => {
                       ? "bg-gray-400 opacity-50"
                       : "bg-yellow"
                   }`}
+                  disabled={color !== currentTurn.toLowerCase()}
                   onClick={() => {
                     movePlayer(diceValue, piece, players.yellow);
                   }}
@@ -226,6 +293,7 @@ const PlayerControls: React.FC = () => {
                       ? "bg-gray-400 opacity-50"
                       : "bg-blue"
                   }`}
+                  disabled={color !== currentTurn.toLowerCase()}
                   onClick={() => {
                     movePlayer(diceValue, piece, players.blue);
                   }}

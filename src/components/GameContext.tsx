@@ -1,5 +1,6 @@
 "use client";
 import React, { createContext, useState, useContext, ReactNode } from "react";
+import { SocketType } from "./utils/socket";
 
 export interface Piece {
   position: number | string;
@@ -20,6 +21,12 @@ interface GameContextType {
   setCurrentTurn: (turn: string) => void;
   players: Record<string, Player>;
   setPlayers: (players: Record<string, Player>) => void;
+  color: string;
+  setColor: (color: string) => void;
+  roomCode: string;
+  setRoomCode: (code: string) => void;
+  socket: SocketType;
+  setSocket: (socket: SocketType) => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -29,6 +36,9 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [diceValue, setDiceValue] = useState<number>(0);
   const [currentTurn, setCurrentTurn] = useState<string>("RED");
+  const [color, setColor] = useState<string>("");
+  const [roomCode, setRoomCode] = useState<string>("");
+  const [socket, setSocket] = useState<SocketType>(null);
   const [players, setPlayers] = useState<Record<string, Player>>({
     red: {
       name: "",
@@ -317,6 +327,12 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
         setCurrentTurn,
         players,
         setPlayers,
+        color,
+        setColor,
+        roomCode,
+        setRoomCode,
+        socket,
+        setSocket,
       }}
     >
       {children}

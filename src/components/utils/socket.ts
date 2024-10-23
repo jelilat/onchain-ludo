@@ -6,19 +6,29 @@ const URL =
 export type SocketType = typeof Socket | null;
 let socket: SocketType = null;
 
-export const initiateSocketConnection = (): SocketType => {
+export const getSocket = (): SocketType => {
   if (!socket) {
-    socket = io(URL);
-    console.log("Connecting to socket.io server...");
+    console.log("Creating new socket connection");
+    socket = io(URL, {
+      transports: ["websocket"],
+      autoConnect: true,
+    });
+
+    socket.on("connect", () => {
+      console.log("Socket connected successfully");
+    });
+
+    socket.on("connect_error", (error: string) => {
+      console.error("Socket connection error:", error);
+    });
   }
   return socket;
 };
 
 export const disconnectSocket = () => {
   if (socket) {
+    console.log("Disconnecting socket");
     socket.disconnect();
-    console.log("Disconnected from socket.io server.");
+    socket = null;
   }
 };
-
-export const getSocket = (): SocketType | null => socket;
