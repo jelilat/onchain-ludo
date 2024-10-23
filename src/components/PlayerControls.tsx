@@ -45,6 +45,31 @@ const PlayerControls: React.FC = () => {
     }
   }, [socket]);
 
+  const updateGameState = async (
+    roomCode: string,
+    players: Record<string, Player>,
+    turn: string,
+    winners: string[]
+  ) => {
+    socket!.emit("updateGameState", {
+      roomCode,
+      players,
+      turn,
+      winners,
+    });
+
+    const response = await fetch(`/play`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ roomCode, players }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log(data);
+    }
+  };
+
   const getNextTurn = (
     currentTurn: string,
     winners: string[],
@@ -83,12 +108,7 @@ const PlayerControls: React.FC = () => {
         sixes.current = 0;
         const nextTurn = getNextTurn(currentTurn, winners, turns);
         setCurrentTurn(nextTurn);
-        socket!.emit("updateGameState", {
-          roomCode,
-          players,
-          turn: nextTurn,
-          winners,
-        });
+        updateGameState(roomCode, players, nextTurn, winners);
       } else if (activePieces.length === 1 && localDiceValue != 6) {
         movePlayer(localDiceValue, activePieces[0], currentPlayer);
       }
@@ -125,12 +145,12 @@ const PlayerControls: React.FC = () => {
     }
     const nextTurn = getNextTurn(currentTurn, winners, turns);
 
-    socket!.emit("updateGameState", {
+    updateGameState(
       roomCode,
-      players: updatedPlayers,
-      turn: value === 6 ? currentTurn : nextTurn,
-      winners,
-    });
+      updatedPlayers,
+      value === 6 ? currentTurn : nextTurn,
+      winners
+    );
   };
 
   const movePlayer = (
@@ -154,12 +174,7 @@ const PlayerControls: React.FC = () => {
           updatedWinners.push(currentTurn);
         }
 
-        socket!.emit("updateGameState", {
-          roomCode,
-          players: updatedPlayers,
-          turn: currentTurn,
-          winners: updatedWinners,
-        });
+        updateGameState(roomCode, updatedPlayers, currentTurn, updatedWinners);
       } else if (newPosition < currentPlayer.path.length) {
         piece.position = newPosition;
         handleCollision(currentPlayer.path, localDiceValue, newPosition);
