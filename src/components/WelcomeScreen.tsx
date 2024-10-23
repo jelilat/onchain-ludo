@@ -203,7 +203,7 @@ const WelcomeScreen: React.FC = () => {
                 </div>
               )}
             </div>
-            <div>
+            {/* <div>
               <span className="font-semibold">KEYBOARD CONTROLS</span> <br />
               <span className="bg-black text-white px-2 py-1 rounded-md">
                 Space
@@ -214,7 +214,7 @@ const WelcomeScreen: React.FC = () => {
               <span className="bg-black text-white p-1 rounded-md">3</span>{" "}
               <span className="bg-black text-white p-1 rounded-md">4</span> for
               players
-            </div>
+            </div> */}
             <hr className="my-4 border-black" />
             <div className="super-center">
               Developed By @tjelailah /&nbsp;
