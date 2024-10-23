@@ -21,7 +21,6 @@ const PlayerControls: React.FC = () => {
   useEffect(() => {
     if (socket) {
       socket.on("diceRolled", (data: { value: number; turn: string }) => {
-        console.log("diceRolled", data);
         setDiceValue(data.value);
         setCurrentTurn(data.turn);
       });
@@ -33,6 +32,7 @@ const PlayerControls: React.FC = () => {
           turn: string;
           winners: string[];
         }) => {
+          console.log("gameStateUpdated", data);
           setDiceValue(0);
           setPlayers(data.players);
           setCurrentTurn(data.turn);
@@ -143,8 +143,9 @@ const PlayerControls: React.FC = () => {
 
     if (piece.status === "active") {
       const newPosition = (piece.position as number) + localDiceValue;
-      if (newPosition === currentPlayer.path.length) {
+      if (newPosition === currentPlayer.path.length - 1) {
         piece.status = "win";
+        piece.position = newPosition;
         // check if all the piece status are wins
         const allWin = updatedPlayers[currentTurn.toLowerCase()].pieces.every(
           (piece) => piece.status === "win"
