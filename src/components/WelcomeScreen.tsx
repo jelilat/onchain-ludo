@@ -15,6 +15,8 @@ interface RoomData {
 const WelcomeScreen: React.FC = () => {
   const [gameBoard, setGameBoard] = useState<boolean>(false);
   const [playerName, setPlayerName] = useState<string>("");
+  const [numOfPlayers, setNumOfPlayers] = useState<number>(0);
+  const [joined, setJoined] = useState<boolean>(false);
   const { players, color, setColor, roomCode, setRoomCode, socket, setSocket } =
     useGameContext();
 
@@ -34,7 +36,11 @@ const WelcomeScreen: React.FC = () => {
 
     newSocket.on("playerJoined", ({ newPlayer }: { newPlayer: Player }) => {
       console.log("New player joined:", newPlayer);
-      players[newPlayer.color].name = newPlayer.name;
+      const playerIndex = colors.indexOf(newPlayer.color);
+      if (playerIndex !== -1) {
+        players[newPlayer.color].name = newPlayer.name;
+        setNumOfPlayers(playerIndex + 1);
+      }
     });
 
     newSocket.on(
@@ -42,6 +48,7 @@ const WelcomeScreen: React.FC = () => {
       ({ removedPlayer }: { removedPlayer: Player }) => {
         console.log("Player left:", removedPlayer);
         players[removedPlayer.color].name = "";
+        setNumOfPlayers(numOfPlayers - 1);
       }
     );
 
@@ -60,6 +67,12 @@ const WelcomeScreen: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (numOfPlayers === 4) {
+      setGameBoard(true);
+    }
+  }, [numOfPlayers]);
+
   const updatePlayerName = (color: string, newName: string) => {
     players[color].name = newName;
   };
@@ -74,7 +87,7 @@ const WelcomeScreen: React.FC = () => {
     if (response.ok) {
       console.log(await response.json());
       updatePlayerName(color, playerName);
-      setGameBoard(true);
+      setJoined(true);
       if (socket) {
         socket.emit("joinRoom", { roomCode, playerName, color });
       }
@@ -113,38 +126,54 @@ const WelcomeScreen: React.FC = () => {
               <h2 className="super-center text-2xl font-semibold">Play Ludo</h2>
               {color ? (
                 <div>
-                  <div className="control3">
-                    <div className="lb">
-                      <button
-                        id="move-blue1"
-                        className={`player playersel bg-${color}`}
-                      ></button>
-                      &nbsp;&nbsp;
-                      <span id={`${color}_player_name`} className="f">
-                        <input
-                          type="text"
-                          className="cun"
-                          value={playerName}
-                          onChange={(e) => setPlayerName(e.target.value)}
-                        />
-                        <button className="bot botoff"></button>
-                      </span>
-                    </div>
-                  </div>
-                  <div className="super-center">
-                    <button id="start_btn" onClick={() => joinRoom(roomCode)}>
-                      Start Game
-                    </button>
-                    <button
-                      id="loading_btn"
-                      style={{ display: "none" }}
-                      disabled
-                    >
-                      <div className="spinner-border text-danger" role="status">
-                        <span className="visually-hidden">Loading...</span>
+                  {!joined ? (
+                    <div>
+                      <div className="control3">
+                        <div className="lb">
+                          <button
+                            id="move-blue1"
+                            className={`player playersel bg-${color}`}
+                          ></button>
+                          &nbsp;&nbsp;
+                          <span id={`${color}_player_name`} className="f">
+                            <input
+                              type="text"
+                              className="cun"
+                              value={playerName}
+                              onChange={(e) => setPlayerName(e.target.value)}
+                            />
+                            <button className="bot botoff"></button>
+                          </span>
+                        </div>
                       </div>
-                    </button>
-                  </div>
+                      <div className="super-center">
+                        <button
+                          id="start_btn"
+                          onClick={() => joinRoom(roomCode)}
+                        >
+                          Start Game
+                        </button>
+                        <button
+                          id="loading_btn"
+                          style={{ display: "none" }}
+                          disabled
+                        >
+                          <div
+                            className="spinner-border text-danger"
+                            role="status"
+                          >
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="super-center">
+                      <p>
+                        Waiting for {4 - numOfPlayers} more players to join...
+                      </p>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="justify-center text-center">
