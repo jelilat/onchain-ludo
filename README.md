@@ -1,4 +1,6 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Multiplayer Ludo Game with Prediction Market
+
+This project is a multiplayer Ludo game powered by zk proofs and enhanced with a prediction market feature. Players can join a game room, play Ludo, and spectators can stake tokens to predict the winner.
 
 ## Getting Started
 
@@ -14,23 +16,17 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Multiplayer Ludo Game
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Join or Create a Room**: Players can create a new game room or join an existing one using a room code.
+- **Real-time Gameplay**: The game supports real-time interactions using WebSockets, allowing players to see each other's moves instantly.
+- **Player Colors**: Each player is assigned a unique color (red, green, yellow, or blue) to represent them on the board.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Prediction Market
 
-## Learn More
+- **Stake Tokens**: Spectators can stake tokens on the player they believe will win the game.
+- **Market Dynamics**: The prediction market adjusts odds based on the stakes placed, providing a dynamic betting experience.
+- **Win Rewards**: Correct predictions are rewarded with tokens, incentivising participation and engagement.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Link to the [zk prover and verifier](https://github.com/jelilat/ludo-zk)
+Link to the [websocket server](https://github.com/jelilat/ludo-server)
